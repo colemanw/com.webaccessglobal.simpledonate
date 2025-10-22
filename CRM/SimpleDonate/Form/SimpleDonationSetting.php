@@ -51,7 +51,7 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
       'domain_id' => $domainID,
       'return' => "simple_donation_page",
     ));
-    $this->_defaults['simpleDonation'] = CRM_Utils_Array::value('simple_donation_page', $settings['values'][$domainID]);
+    $this->_defaults['simpleDonation'] = $settings['values'][$domainID]['simple_donation_page'] ?? NULL;
     $this->_defaults['ziptastic'] = CRM_Core_BAO_Setting::getItem('Simple Donation', 'ziptastic_enable');
     return $this->_defaults;
   }
@@ -115,7 +115,7 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
 
     $zipParams = array(
       'domain_id' => CRM_Core_Config::domainID(),
-      'ziptastic_enable' => CRM_Utils_Array::value('ziptastic', $params) ? 1 : 0,
+      'ziptastic_enable' => (int) !empty($params['ziptastic']),
     );
     $result = civicrm_api3('setting', 'create', $zipParams);
     if (CRM_Utils_Array::value('is_error', $result, FALSE)) {
@@ -127,7 +127,7 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
   static public function transactDonation() {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
-    $params = CRM_Utils_Array::value('params', $_POST);
+    $params = $_POST['params'] ?? [];
 
     $params['cardExpiry'] = str_replace('20', '', $params['cardExpiry']);
     //check credit card expiry validation
@@ -147,9 +147,9 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
         exit;
       }
     }
-    $params['amount'] = CRM_Utils_Array::value('amount', $_POST);
-    $creditInfo = CRM_Utils_Array::value('creditInfo', $_POST);
-    $isTest = CRM_Utils_Array::value('isTest', $_POST);
+    $params['amount'] = $_POST['amount'] ?? NULL;
+    $creditInfo = $_POST['creditInfo'] ?? NULL;
+    $isTest = $_POST['isTest'] ?? NULL;
     //create Contact, billing address
     $userInfo = explode(' ', $params['user']);
     $params['first_name'] = $userInfo[0];
@@ -181,7 +181,7 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
       $dedupeParams['check_permission'] = FALSE;
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
       // if we find more than one contact, use the first one
-      $contactID = CRM_Utils_Array::value(0, $ids);
+      $contactID = $ids[0] ?? NULL;
       if (!$contactID) {
         $cont = civicrm_api3('Contact', 'create', $cParam);
         $contactID = $cont['id'];
@@ -224,7 +224,7 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
       'id' => $donatePageID,
     ));
     $contributionparams = array();
-    $isrecur = CRM_Utils_Array::value('recur', $params);
+    $isrecur = $params['recur'] ?? NULL;
     $contributionparams = array(
       "billing_first_name" => $params['first_name'],
       "first_name" => $params['first_name'],
@@ -245,8 +245,8 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
       "postal_code" => $params['zip'],
       "email" => $params['email'],
       "contribution_page_id" => $donatePageID,
-      "payment_processor_id" => CRM_Utils_Array::value('payment_processor', $params),
-      "payment_processor" => CRM_Utils_Array::value('payment_processor', $params),
+      "payment_processor_id" => $params['payment_processor'] ?? NULL,
+      "payment_processor" => $params['payment_processor'] ?? NULL,
       "is_test" => $isTest,
       "is_pay_later" => $params['is_pay_later'],
       "total_amount"=> $params['amount'],
@@ -316,7 +316,7 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
       $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
       $recurParams['invoice_id'] = $recurParams['trxn_id'] = md5(uniqid(rand(), TRUE));
       $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-      $recurParams['payment_processor_id'] = CRM_Utils_Array::value('payment_processor_id', $contributionparams);
+      $recurParams['payment_processor_id'] = $contributionparams['payment_processor_id'] ?? NULL;
       $recurParams['is_email_receipt'] = 1;
       //create recurring contribution record
       $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
