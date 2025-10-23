@@ -338,7 +338,7 @@ class CRM_SimpleDonate_Form_SimpleDonationSetting extends CRM_Admin_Form_Setting
       $result = civicrm_api3('Contribution', 'transact', $contributionparams);
     }
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
       $errorList['error'] = $error;
       return $errorList;
