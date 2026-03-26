@@ -1,15 +1,14 @@
 (function (angular, $, _) {
-  var resourceUrl = CRM.resourceUrls['com.webaccessglobal.simpledonate'];
   var simpleDonation = angular.module('simpledonate', ['ngRoute']);
   simpleDonation.config([
     '$routeProvider',
     function ($routeProvider) {
       $routeProvider.when('/donation/:id/', {
-        templateUrl: resourceUrl + '/partials/simpledonate.html',
+        templateUrl: '~/simpledonate/simpledonate.html',
         controller: 'SimpleDonationCtrl',
       });
       $routeProvider.when('/donation/:id/:thanks', {
-        templateUrl: resourceUrl + '/partials/thankYou.html',
+        templateUrl: '~/simpledonate/thankYou.html',
         controller: 'SimpleDonationCtrl'
       });
     }

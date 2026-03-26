@@ -256,6 +256,7 @@ function simpledonate_civicrm_pageRun(&$page) {
 function simpledonate_civicrm_angularModules(&$angularModule) {
   $angularModule['simpledonate'] = array(
     'ext' => 'com.webaccessglobal.simpledonate',
+    'partials' => ['partials'],
     'js' => array(
       'js/simpledonate.js',
       'js/libs/parsley.min.js',
